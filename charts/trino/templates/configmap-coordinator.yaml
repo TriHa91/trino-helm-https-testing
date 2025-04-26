@@ -18,21 +18,24 @@ data:
 
   jvm.config: |
     -server
-    -agentpath:/usr/lib/trino/bin/libjvmkill.so
-    -Xmx{{ .Values.coordinator.jvm.maxHeapSize }}
-    -XX:+{{ .Values.coordinator.jvm.gcMethod.type }}
-    -XX:G1HeapRegionSize={{ .Values.coordinator.jvm.gcMethod.g1.heapRegionSize }}
+    -Xmx16G
+    -XX:InitialRAMPercentage=40
+    -XX:MaxRAMPercentage=80
+    -XX:G1HeapRegionSize=32M
     -XX:+ExplicitGCInvokesConcurrent
-    -XX:+HeapDumpOnOutOfMemoryError
     -XX:+ExitOnOutOfMemoryError
+    -XX:+HeapDumpOnOutOfMemoryError
     -XX:-OmitStackTraceInFastThrow
     -XX:ReservedCodeCacheSize=512M
     -XX:PerMethodRecompilationCutoff=10000
     -XX:PerBytecodeRecompilationCutoff=10000
     -Djdk.attach.allowAttachSelf=true
     -Djdk.nio.maxCachedBufferSize=2000000
-    # Allow loading dynamic agent used by JOL
+    -Dfile.encoding=UTF-8
+    # -Djava.io.tmpdir=./jtempdir
     -XX:+EnableDynamicAgentLoading
+    -XX:+UnlockDiagnosticVMOptions
+    -XX:G1NumCollectionsKeepPinned=10000000
   {{/* only check the version number if the image is not overriden in any way */}}
   {{- with .Values.image -}}
   {{- if and (eq .repository "trinodb/trino") (not .useRepositoryAsSoleImageReference) (not .registry) (not .digest) (gt (default $.Chart.AppVersion .tag | int ) 447 ) }}
@@ -57,7 +60,7 @@ data:
     {{- if .Values.coordinator.config.memory.heapHeadroomPerNode }}
     memory.heap-headroom-per-node={{ .Values.coordinator.config.memory.heapHeadroomPerNode }}
     {{- end }}
-    discovery.uri=http://localhost:{{ .Values.service.port }}
+    discovery.uri=http://trino-coordinator:{{ .Values.service.port }}
     {{- if .Values.server.config.authenticationType }}
     http-server.authentication.type={{ .Values.server.config.authenticationType }}
     {{- end }}
@@ -135,7 +138,7 @@ data:
   {{- if contains "PASSWORD" .Values.server.config.authenticationType }}{{- if not (index .Values.coordinator.additionalConfigFiles "password-authenticator.properties") }}
   password-authenticator.properties: |
     password-authenticator.name=file
-    file.password-file={{ .Values.server.config.path }}/auth/password/password.db
+    file.password-file=/etc/trino/pwd.db
   {{- end }}{{- end }}
 
   {{- if .Values.auth.groups }}{{- if not (index .Values.coordinator.additionalConfigFiles "group-provider.properties") }}
