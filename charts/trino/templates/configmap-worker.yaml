@@ -83,6 +83,12 @@ data:
     # {{- .Values.server.workerExtraConfig | nindent 4 }}
     # {{- end }}
 
+{{- if contains "PASSWORD" .Values.server.config.authenticationType }}{{- if not (index .Values.coordinator.additionalConfigFiles "password-authenticator.properties") }}
+  password-authenticator.properties: |
+    password-authenticator.name=file
+    file.password-file=/etc/trino/pwd.db
+  {{- end }}{{- end }}
+
 {{- if .Values.worker.gracefulShutdown.enabled }}
   access-control.properties: |
     access-control.name=file
