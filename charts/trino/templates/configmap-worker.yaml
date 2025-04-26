@@ -60,7 +60,7 @@ data:
     # {{- if .Values.worker.config.memory.heapHeadroomPerNode }}
     # memory.heap-headroom-per-node={{ .Values.worker.config.memory.heapHeadroomPerNode }}
     # {{- end }}
-    discovery.uri=http://trino-coordinator:{{ .Values.service.server.config.port }}
+    discovery.uri=https://trino-coordinator:{{ .Values.service.server.config.port }}
     http-server.process-forwarded=true
     http-server.authentication.type=PASSWORD
     password-authenticator.config-files=/etc/trino/password-authenticator.properties
