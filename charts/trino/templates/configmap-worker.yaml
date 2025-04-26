@@ -19,21 +19,24 @@ data:
 
   jvm.config: |
     -server
-    -agentpath:/usr/lib/trino/bin/libjvmkill.so
-    -Xmx{{ .Values.worker.jvm.maxHeapSize }}
-    -XX:+{{ .Values.worker.jvm.gcMethod.type }}
-    -XX:G1HeapRegionSize={{ .Values.worker.jvm.gcMethod.g1.heapRegionSize }}
+    -Xmx16G
+    -XX:InitialRAMPercentage=40
+    -XX:MaxRAMPercentage=80
+    -XX:G1HeapRegionSize=32M
     -XX:+ExplicitGCInvokesConcurrent
-    -XX:+HeapDumpOnOutOfMemoryError
     -XX:+ExitOnOutOfMemoryError
+    -XX:+HeapDumpOnOutOfMemoryError
     -XX:-OmitStackTraceInFastThrow
     -XX:ReservedCodeCacheSize=512M
     -XX:PerMethodRecompilationCutoff=10000
     -XX:PerBytecodeRecompilationCutoff=10000
     -Djdk.attach.allowAttachSelf=true
     -Djdk.nio.maxCachedBufferSize=2000000
-    # Allow loading dynamic agent used by JOL
-    -XX:+EnableDynamicAgentLoading
+    -Dfile.encoding=UTF-8
+#-Djava.io.tmpdir=./jtempdir
+-XX:+EnableDynamicAgentLoading
+-XX:+UnlockDiagnosticVMOptions
+-XX:G1NumCollectionsKeepPinned=10000000
   {{/* only check the version number if the image is not overriden in any way */}}
   {{- with .Values.image -}}
   {{- if and (eq .repository "trinodb/trino") (not .useRepositoryAsSoleImageReference) (not .registry) (not .digest) (gt (default $.Chart.AppVersion .tag | int ) 447 ) }}
@@ -52,25 +55,33 @@ data:
   config.properties: |
     coordinator=false
     http-server.http.port={{ .Values.service.port }}
-    query.max-memory={{ .Values.server.config.query.maxMemory }}
-    query.max-memory-per-node={{ .Values.worker.config.query.maxMemoryPerNode }}
-    {{- if .Values.worker.config.memory.heapHeadroomPerNode }}
-    memory.heap-headroom-per-node={{ .Values.worker.config.memory.heapHeadroomPerNode }}
-    {{- end }}
-    discovery.uri=http://{{ template "trino.fullname" . }}:{{ .Values.service.port }}
-    {{- range $configValue := .Values.additionalConfigProperties }}
-    {{ $configValue }}
-    {{- end }}
-    {{- if $workerJmx.enabled }}
-    jmx.rmiregistry.port={{- $workerJmx.registryPort }}
-    jmx.rmiserver.port={{- $workerJmx.serverPort }}
-    {{- end }}
-    {{- if .Values.worker.gracefulShutdown.enabled }}
-    shutdown.grace-period={{- .Values.worker.gracefulShutdown.gracePeriodSeconds -}}s
-    {{- end }}
-    {{- if .Values.server.workerExtraConfig }}
-    {{- .Values.server.workerExtraConfig | nindent 4 }}
-    {{- end }}
+    # query.max-memory={{ .Values.server.config.query.maxMemory }}
+    # query.max-memory-per-node={{ .Values.worker.config.query.maxMemoryPerNode }}
+    # {{- if .Values.worker.config.memory.heapHeadroomPerNode }}
+    # memory.heap-headroom-per-node={{ .Values.worker.config.memory.heapHeadroomPerNode }}
+    # {{- end }}
+    discovery.uri=http://{{ template "trino.fullname" . }}:{{ .Values.service.server.config.port }}
+    http-server.process-forwarded=true
+    http-server.authentication.type=PASSWORD
+    password-authenticator.config-files=/etc/trino/password-authenticator.properties
+    http-server.https.enabled=true
+    http-server.https.port=8443
+    http-server.https.keystore.path=/etc/trino/private_key.pem
+    internal-communication.shared-secret=ABCXYZ123
+    internal-communication.https.required=true
+    # {{- range $configValue := .Values.additionalConfigProperties }}
+    # {{ $configValue }}
+    # {{- end }}
+    # {{- if $workerJmx.enabled }}
+    # jmx.rmiregistry.port={{- $workerJmx.registryPort }}
+    # jmx.rmiserver.port={{- $workerJmx.serverPort }}
+    # {{- end }}
+    # {{- if .Values.worker.gracefulShutdown.enabled }}
+    # shutdown.grace-period={{- .Values.worker.gracefulShutdown.gracePeriodSeconds -}}s
+    # {{- end }}
+    # {{- if .Values.server.workerExtraConfig }}
+    # {{- .Values.server.workerExtraConfig | nindent 4 }}
+    # {{- end }}
 
 {{- if .Values.worker.gracefulShutdown.enabled }}
   access-control.properties: |
