@@ -192,3 +192,16 @@ data:
   {{- range $key, $val := .Values.kafka.tableDescriptions }}
   {{ $key }}: {{ $val | quote }}
   {{- end }}
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ template "trino.fullname" . }}-security-key
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "trino.labels" . | nindent 4 }}
+    app.kubernetes.io/component: coordinator
+data:
+  private_key.pem: |
+    {{ .Files.Get "path/to/private_key.pem" | nindent 4 }}
