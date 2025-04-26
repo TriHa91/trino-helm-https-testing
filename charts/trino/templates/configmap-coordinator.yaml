@@ -54,33 +54,37 @@ data:
     coordinator=true
     node-scheduler.include-coordinator={{ .Values.coordinator.config.nodeScheduler.includeCoordinator }}
     http-server.http.port={{ .Values.service.port }}
-    query.max-memory={{ .Values.server.config.query.maxMemory }}
-    query.max-memory-per-node={{ .Values.coordinator.config.query.maxMemoryPerNode }}
-    {{- if .Values.coordinator.config.memory.heapHeadroomPerNode }}
-    memory.heap-headroom-per-node={{ .Values.coordinator.config.memory.heapHeadroomPerNode }}
-    {{- end }}
-    discovery.uri=http://trino-coordinator:{{ .Values.service.port }}
-    {{- if .Values.server.config.authenticationType }}
+    # query.max-memory={{ .Values.server.config.query.maxMemory }}
+    # query.max-memory-per-node={{ .Values.coordinator.config.query.maxMemoryPerNode }}
+    # {{- if .Values.coordinator.config.memory.heapHeadroomPerNode }}
+    # memory.heap-headroom-per-node={{ .Values.coordinator.config.memory.heapHeadroomPerNode }}
+    # {{- end }}
+    discovery.uri=http://trino-coordinator:{{ .Values.service.config.https.port }}
+    # {{- if .Values.server.config.authenticationType }}
     http-server.authentication.type={{ .Values.server.config.authenticationType }}
-    {{- end }}
-    {{- range $configValue := .Values.additionalConfigProperties }}
-    {{ $configValue }}
-    {{- end }}
-    {{- if .Values.server.config.https.enabled }}
+    password-authenticator.config-files=${ENV:TRINO_HOME}/password-authenticator.properties
+    internal-communication.shared-secret=ABCXYZ123
+    internal-communication.https.required=true
+    http-server.authentication.allow-insecure-over-http=true
+    # {{- end }}
+    # {{- range $configValue := .Values.additionalConfigProperties }}
+    # {{ $configValue }}
+    # {{- end }}
+    # {{- if .Values.server.config.https.enabled }}
     http-server.https.enabled=true
     http-server.https.port={{ .Values.server.config.https.port }}
     http-server.https.keystore.path={{ .Values.server.config.https.keystore.path }}
-    {{- end }}
-    {{- if $coordinatorJmx.enabled }}
-    jmx.rmiregistry.port={{- $coordinatorJmx.registryPort }}
-    jmx.rmiserver.port={{- $coordinatorJmx.serverPort }}
-    {{- end }}
-    {{- if .Values.worker.gracefulShutdown.enabled }}
-    shutdown.grace-period={{- .Values.worker.gracefulShutdown.gracePeriodSeconds -}}s
-    {{- end }}
-    {{- if .Values.server.coordinatorExtraConfig }}
-    {{- .Values.server.coordinatorExtraConfig | nindent 4 }}
-    {{- end }}
+    # {{- end }}
+    # {{- if $coordinatorJmx.enabled }}
+    # jmx.rmiregistry.port={{- $coordinatorJmx.registryPort }}
+    # jmx.rmiserver.port={{- $coordinatorJmx.serverPort }}
+    # {{- end }}
+    # {{- if .Values.worker.gracefulShutdown.enabled }}
+    # shutdown.grace-period={{- .Values.worker.gracefulShutdown.gracePeriodSeconds -}}s
+    # {{- end }}
+    # {{- if .Values.server.coordinatorExtraConfig }}
+    # {{- .Values.server.coordinatorExtraConfig | nindent 4 }}
+    # {{- end }}
 
 {{- if .Values.accessControl }}
   {{- if eq .Values.accessControl.type "configmap" }}
