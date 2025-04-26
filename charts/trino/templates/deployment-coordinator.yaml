@@ -41,10 +41,10 @@ spec:
         app.kubernetes.io/component: coordinator
         trino.io/network-policy-protection: {{ ternary "enabled" "disabled" .Values.networkPolicy.enabled }}
         {{- if .Values.coordinator.labels }}
-        {{- tpl (toYaml .Values.coordinator.labels) . | nindent 8 }}
         {{- end }}
     spec:
       serviceAccountName: {{ include "trino.serviceAccountName" . }}
+        {{- tpl (toYaml .Values.coordinator.labels) . | nindent 8 }}
       {{- with .Values.securityContext }}
       securityContext:
         {{- toYaml . | nindent 8 }}
@@ -75,12 +75,15 @@ spec:
             name: {{ template "trino.fullname" . }}-resource-groups-volume-coordinator
         {{- end }}
         {{- if or .Values.auth.passwordAuth .Values.auth.passwordAuthSecret }}
-        - name: file-password-authentication-volume
-          secret:
-            secretName: {{ template "trino.passwordSecretName" . }}
-            items:
-              - key: password.db
-                path: password.db
+        # - name: {{ template "trino.coordinator" . }}-security
+        #   secret:
+        #     secretName: {{ template "trino.passwordSecretName" . }}
+        #     items:
+        #       - key: pwd.db
+        #         path: pwd.db
+        - name: security-volume
+          configMap:
+            name: {{ template "trino.coordinator" . }}-security
         {{- end }}
         {{- if or .Values.auth.groups .Values.auth.groupsAuthSecret }}
         - name: file-groups-authentication-volume
@@ -183,8 +186,8 @@ spec:
               {{- end }}
             {{- end }}
             {{- if or .Values.auth.passwordAuth .Values.auth.passwordAuthSecret }}
-            - mountPath: {{ .Values.server.config.path }}/auth/password
-              name: file-password-authentication-volume
+            - mountPath: {{ .Values.server.config.path }}
+              name: security-volume
             {{- end }}
             {{- if or .Values.auth.groups .Values.auth.groupsAuthSecret }}
             - mountPath: {{ .Values.server.config.path }}/auth/group
@@ -194,8 +197,8 @@ spec:
             {{- . | toYaml | nindent 12 }}
             {{- end }}
           ports:
-            - name: http
-              containerPort: {{ .Values.service.port }}
+            - name: https
+              containerPort: {{ .Values.server.config.port }}
               protocol: TCP
             {{- if $coordinatorJmx.enabled }}
             - name: jmx-registry
