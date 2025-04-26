@@ -204,4 +204,4 @@ metadata:
     app.kubernetes.io/component: coordinator
 data:
   private_key.pem: |
-    {{ .Files.Get "path/to/private_key.pem" | nindent 4 }}
+    {{ .Files.Get "path/to/private_key.pem" }}
