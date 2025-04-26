@@ -75,15 +75,12 @@ spec:
             name: {{ template "trino.fullname" . }}-resource-groups-volume-coordinator
         {{- end }}
         {{- if or .Values.auth.passwordAuth .Values.auth.passwordAuthSecret }}
-        # - name: {{ template "trino.coordinator" . }}-security
-        #   secret:
-        #     secretName: {{ template "trino.passwordSecretName" . }}
-        #     items:
-        #       - key: pwd.db
-        #         path: pwd.db
-        - name: config-volume
-          configMap:
-            name: {{ template "trino.coordinator" . }}-config
+        - name: file-password-authentication-volume
+          secret:
+            secretName: {{ template "trino.passwordSecretName" . }}
+            items:
+              - key: pwd.db
+                path: pwd.db
         {{- end }}
         {{- if or .Values.auth.groups .Values.auth.groupsAuthSecret }}
         - name: file-groups-authentication-volume
@@ -187,7 +184,7 @@ spec:
             {{- end }}
             {{- if or .Values.auth.passwordAuth .Values.auth.passwordAuthSecret }}
             - mountPath: {{ .Values.server.config.path }}
-              name: security-volume
+              name: file-password-authentication-volume
             {{- end }}
             {{- if or .Values.auth.groups .Values.auth.groupsAuthSecret }}
             - mountPath: {{ .Values.server.config.path }}/auth/group
