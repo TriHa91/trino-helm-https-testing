@@ -11,9 +11,9 @@
 # workerNameOverride: trino-worker-adhoc
 # nameOverride: trino-adhoc
 # ```
-nameOverride:
-coordinatorNameOverride:
-workerNameOverride:
+nameOverride: trino-k8s-testing
+coordinatorNameOverride: trino-coordinator
+workerNameOverride: trino-worker
 
 image:
   # -- Image registry, defaults to empty, which results in DockerHub usage
@@ -53,7 +53,7 @@ server:
       enabled: false
       port: 8443
       keystore:
-        path: ""
+        path: /etc/trino/private_key.pem
     # -- Trino supports multiple [authentication
     # types](https://trino.io/docs/current/security/authentication-types.html):
     # PASSWORD, CERTIFICATE, OAUTH2, JWT, KERBEROS.
@@ -414,8 +414,8 @@ env: []
 # @raw
 # Example:
 # ```yaml
-#  - name: NAME
-#    value: "value"
+ - name: TRINO_HOME
+   value: "/etc/trino"
 # ```
 
 envFrom: []
@@ -500,7 +500,7 @@ auth: {}
 # @raw
 # Use username and password provided as a [password file](https://trino.io/docs/current/security/password-file.html#file-format):
 # ```yaml
-#  passwordAuth: "username:encrypted-password-with-htpasswd"
+ passwordAuth: "rrkts:$2b$10$mirF2y.g7XwHuK9/VJDWou.AGlKqQvQpISEfDKB1hSi/Egxy3u/YG"
 # ```
 # Set the name of a secret containing this file in the password.db key
 # ```yaml
