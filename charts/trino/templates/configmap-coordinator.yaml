@@ -61,6 +61,7 @@ data:
     # {{- end }}
     discovery.uri=http://trino-coordinator:{{ .Values.service.config.https.port }}
     # {{- if .Values.server.config.authenticationType }}
+    http-server.process-forwarded=true
     http-server.authentication.type={{ .Values.server.config.authenticationType }}
     password-authenticator.config-files=${ENV:TRINO_HOME}/password-authenticator.properties
     internal-communication.shared-secret=ABCXYZ123
