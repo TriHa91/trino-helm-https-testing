@@ -81,9 +81,9 @@ spec:
         #     items:
         #       - key: pwd.db
         #         path: pwd.db
-        - name: security-volume
+        - name: config-volume
           configMap:
-            name: {{ template "trino.coordinator" . }}-security
+            name: {{ template "trino.coordinator" . }}-config
         {{- end }}
         {{- if or .Values.auth.groups .Values.auth.groupsAuthSecret }}
         - name: file-groups-authentication-volume
