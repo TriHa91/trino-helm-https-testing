@@ -50,7 +50,7 @@ server:
   config:
     path: /etc/trino/
     https:
-      enabled: false
+      enabled: true
       port: 8443
       keystore:
         path: /etc/trino/
@@ -409,7 +409,7 @@ additionalCatalogs: {}
 # additionalCatalogs -- Deprecated, use `catalogs` instead. Configure additional
 # [catalogs](https://trino.io/docs/current/installation/deployment.html#catalog-properties).
 
-env: []
+env:
 # env -- additional environment variables added to every pod, specified as a list with explicit values
 # @raw
 # Example:
