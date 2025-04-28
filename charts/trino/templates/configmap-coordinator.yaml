@@ -63,7 +63,7 @@ data:
     # {{- if .Values.server.config.authenticationType }}
     http-server.process-forwarded=true
     http-server.authentication.type={{ .Values.server.config.authenticationType }}
-    password-authenticator.config-files=${ENV:TRINO_HOME}/password-authenticator.properties
+    password-authenticator.config-files={{ .Values.server.config.path }}/password-authenticator.properties
     internal-communication.shared-secret=ABCXYZ123
     internal-communication.https.required=true
     http-server.authentication.allow-insecure-over-http=true
@@ -142,7 +142,7 @@ data:
   {{- if contains "PASSWORD" .Values.server.config.authenticationType }}{{- if not (index .Values.coordinator.additionalConfigFiles "password-authenticator.properties") }}
   password-authenticator.properties: |
     password-authenticator.name=file
-    file.password-file=/etc/trino/pwd.db
+    file.password-file={{ .Values.server.config.path }}/pwd.db
   {{- end }}{{- end }}
 
   {{- if .Values.auth.groups }}{{- if not (index .Values.coordinator.additionalConfigFiles "group-provider.properties") }}
