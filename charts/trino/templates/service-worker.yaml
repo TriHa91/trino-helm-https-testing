@@ -12,10 +12,10 @@ metadata:
 spec:
   clusterIP: None
   ports:
-    - port: {{ .Values.service.port }}
-      targetPort: http
+    - port: {{ .Values.server.config.https.port }}
+      targetPort: {{ .Values.server.config.https.port }}
       protocol: TCP
-      name: http
+      name: https
     {{- if $workerJmx.exporter.enabled }}
     - port: {{$workerJmx.exporter.port }}
       targetPort: jmx-exporter
