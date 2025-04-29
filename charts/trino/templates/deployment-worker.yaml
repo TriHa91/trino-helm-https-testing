@@ -64,6 +64,9 @@ spec:
           configMap:
             name: {{ template "trino.catalog" . }}
         {{- end }}
+        - name: ssl-volume
+          configMap:
+            name: {{ template "trino.fullname" . }}-security-key
         - name: schemas-volume
           configMap:
             name: {{ template "trino.fullname" . }}-schemas-volume-worker
@@ -76,6 +79,14 @@ spec:
         - name: access-control-volume
           configMap:
             name: {{ template "trino.fullname" . }}-access-control-volume-worker
+        {{- end }}
+        {{- if or .Values.auth.passwordAuth .Values.auth.passwordAuthSecret }}
+        - name: file-password-authentication-volume
+          secret:
+            secretName: {{ template "trino.passwordSecretName" . }}
+            items:
+              - key: pwd.db
+                path: pwd.db
         {{- end }}
         {{- range .Values.configMounts }}
         - name: {{ .name }}
@@ -126,6 +137,8 @@ spec:
           volumeMounts:
             - mountPath: {{ .Values.server.config.path }}
               name: config-volume
+            - mountPath: {{ .Values.server.config.path }}
+              name: ssl-volume
             {{- if or .Values.catalogs .Values.additionalCatalogs }}
             - mountPath: {{ .Values.server.config.path }}/catalog
               name: catalog-volume
@@ -157,6 +170,10 @@ spec:
               subPath: {{ .subPath }}
               {{- end }}
             {{- end }}
+            {{- if or .Values.auth.passwordAuth .Values.auth.passwordAuthSecret }}
+            - mountPath: {{ .Values.server.config.path }}
+              name: file-password-authentication-volume
+            {{- end }}
             {{- range .Values.worker.secretMounts }}
             - name: {{ .name }}
               mountPath: {{ .path }}
@@ -168,8 +185,8 @@ spec:
             {{- . | toYaml | nindent 12 }}
             {{- end }}
           ports:
-            - name: http
-              containerPort: {{ .Values.service.port }}
+            - name: https
+              containerPort: {{ .Values.server.config.port }}
               protocol: TCP
             {{- if $workerJmx.enabled }}
             - name: jmx-registry
