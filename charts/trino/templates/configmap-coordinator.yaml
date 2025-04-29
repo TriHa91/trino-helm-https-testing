@@ -12,6 +12,7 @@ data:
     node.environment={{ tpl .Values.server.node.environment . }}
     node.data-dir={{ .Values.server.node.dataDir }}
     plugin.dir={{ .Values.server.node.pluginDir }}
+    node.id={{ template "trino.coordinator" . }}
   {{- range $configValue := .Values.additionalNodeProperties }}
     {{ $configValue }}
   {{- end }}
