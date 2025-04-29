@@ -127,6 +127,18 @@ data:
 apiVersion: v1
 kind: ConfigMap
 metadata:
+  name: {{ template "trino.fullname" . }}-security-key
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "trino.labels" . | nindent 4 }}
+    app.kubernetes.io/component: worker
+data:
+  private_key.pem: |
+    {{ .Files.Get "path/to/private_key.pem" }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
   name: {{ template "trino.fullname" . }}-schemas-volume-worker
   namespace: {{ .Release.Namespace }}
   labels:
