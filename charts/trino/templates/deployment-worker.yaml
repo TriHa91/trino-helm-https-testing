@@ -189,7 +189,7 @@ spec:
               containerPort: {{ .Values.service.port }}
               protocol: TCP
             - name: https
-              containerPort: {{ .Values.server.config.port }}
+              containerPort: {{ .Values.server.config.https.port }}
               protocol: TCP
             {{- if $workerJmx.enabled }}
             - name: jmx-registry
