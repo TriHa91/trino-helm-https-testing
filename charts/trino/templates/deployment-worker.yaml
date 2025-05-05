@@ -137,7 +137,7 @@ spec:
           volumeMounts:
             - mountPath: {{ .Values.server.config.path }}
               name: config-volume
-            - mountPath: {{ .Values.server.config.path }}
+            - mountPath: {{ .Values.server.config.path }}security/
               name: ssl-volume
             {{- if or .Values.catalogs .Values.additionalCatalogs }}
             - mountPath: {{ .Values.server.config.path }}/catalog
@@ -171,7 +171,7 @@ spec:
               {{- end }}
             {{- end }}
             {{- if or .Values.auth.passwordAuth .Values.auth.passwordAuthSecret }}
-            - mountPath: {{ .Values.server.config.path }}
+            - mountPath: {{ .Values.server.config.path }}auth/
               name: file-password-authentication-volume
             {{- end }}
             {{- range .Values.worker.secretMounts }}
@@ -185,6 +185,9 @@ spec:
             {{- . | toYaml | nindent 12 }}
             {{- end }}
           ports:
+            - name: http
+              containerPort: {{ .Values.service.port }}
+              protocol: TCP
             - name: https
               containerPort: {{ .Values.server.config.port }}
               protocol: TCP
