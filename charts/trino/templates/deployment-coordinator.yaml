@@ -44,7 +44,6 @@ spec:
         {{- end }}
     spec:
       serviceAccountName: {{ include "trino.serviceAccountName" . }}
-        {{- tpl (toYaml .Values.coordinator.labels) . | nindent 8 }}
       {{- with .Values.securityContext }}
       securityContext:
         {{- toYaml . | nindent 8 }}
