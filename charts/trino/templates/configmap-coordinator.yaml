@@ -75,7 +75,15 @@ data:
     # {{- if .Values.server.config.https.enabled }}
     http-server.https.enabled=true
     http-server.https.port={{ .Values.server.config.https.port }}
-    http-server.https.keystore.path={{ .Values.server.config.https.keystore.path }}security/private_key.pem
+    # http-server.https.keystore.path={{ .Values.server.config.https.keystore.path }}security/private_key.pem
+    http-server.https.keystore.path={{ .Values.server.config.https.keystore.path }}security/keystore.jks
+    http-server.https.keystore.key=hanhattri
+    http-server.https.truststore.path={{ .Values.server.config.https.keystore.path }}security/truststore.jks
+    http-server.https.truststore.key=hanhattri
+    internal-communication.https.truststore.path={{ .Values.server.config.https.keystore.path }}security/truststore.jks
+    internal-communication.https.truststore.key=hanhattri
+    internal-communication.https.keystore.path={{ .Values.server.config.https.keystore.path }}security/keystore.jks
+    internal-communication.https.keystore.key=hanhattri
     # {{- end }}
     # {{- if $coordinatorJmx.enabled }}
     # jmx.rmiregistry.port={{- $coordinatorJmx.registryPort }}
@@ -204,5 +212,8 @@ metadata:
     {{- include "trino.labels" . | nindent 4 }}
     app.kubernetes.io/component: coordinator
 data:
-  private_key.pem: |
-    {{ .Files.Get "path/to/private_key.pem" }}
+  keystore.jks: |
+    {{ .Files.Get "/trino-config/keystore.jks" }}
+  truststore.jks: |
+    {{ .Files.Get "/trino-config/truststore.jks" }}
+  
