@@ -488,7 +488,7 @@ shareProcessNamespace:
 
 service:
   annotations: {}
-  type: ClusterIP
+  type: NodePort
   port: 8080
   # service.nodePort -- The port the service listens on the host, for the `NodePort` type. If not set, Kubernetes will
   # [allocate a port
