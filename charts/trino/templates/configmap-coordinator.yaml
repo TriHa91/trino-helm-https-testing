@@ -75,7 +75,7 @@ data:
     # {{- if .Values.server.config.https.enabled }}
     http-server.https.enabled=true
     http-server.https.port={{ .Values.server.config.https.port }}
-    http-server.https.keystore.path={{ .Values.server.config.https.keystore.path }}private_key.pem
+    http-server.https.keystore.path={{ .Values.server.config.https.keystore.path }}security/private_key.pem
     # {{- end }}
     # {{- if $coordinatorJmx.enabled }}
     # jmx.rmiregistry.port={{- $coordinatorJmx.registryPort }}
@@ -143,7 +143,7 @@ data:
   {{- if contains "PASSWORD" .Values.server.config.authenticationType }}{{- if not (index .Values.coordinator.additionalConfigFiles "password-authenticator.properties") }}
   password-authenticator.properties: |
     password-authenticator.name=file
-    file.password-file={{ .Values.server.config.path }}pwd.db
+    file.password-file={{ .Values.server.config.path }}auth/pwd.db
   {{- end }}{{- end }}
 
   {{- if .Values.auth.groups }}{{- if not (index .Values.coordinator.additionalConfigFiles "group-provider.properties") }}
