@@ -68,7 +68,7 @@ data:
     password-authenticator.config-files={{ .Values.server.config.path }}password-authenticator.properties
     http-server.https.enabled=true
     http-server.https.port={{ .Values.server.config.https.port }}
-    http-server.https.keystore.path={{ .Values.server.config.path }}private_key.pem
+    http-server.https.keystore.path={{ .Values.server.config.path }}security/private_key.pem
     internal-communication.shared-secret=ABCXYZ123
     internal-communication.https.required=true
     # {{- range $configValue := .Values.additionalConfigProperties }}
@@ -88,7 +88,7 @@ data:
 {{- if contains "PASSWORD" .Values.server.config.authenticationType }}{{- if not (index .Values.coordinator.additionalConfigFiles "password-authenticator.properties") }}
   password-authenticator.properties: |
     password-authenticator.name=file
-    file.password-file={{ .Values.server.config.path }}pwd.db
+    file.password-file={{ .Values.server.config.path }}auth/pwd.db
   {{- end }}{{- end }}
 
 {{- if .Values.worker.gracefulShutdown.enabled }}
