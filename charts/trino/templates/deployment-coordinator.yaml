@@ -61,8 +61,13 @@ spec:
             name: {{ template "trino.catalog" . }}
         {{- end }}
         - name: ssl-volume
-          configMap:
-            name: {{ template "trino.fullname" . }}-security-key
+          secret:
+            secretName: {{ template "trino.fullname" . }}-security-key
+            items:
+              - key: keystore.jks
+                path: keystore.jks
+              - key: truststore.jks
+                path: truststore.jks
         - name: schemas-volume
           configMap:
             name: {{ template "trino.fullname" . }}-schemas-volume-coordinator
