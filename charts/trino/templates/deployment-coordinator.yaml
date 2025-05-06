@@ -62,12 +62,12 @@ spec:
         {{- end }}
         - name: ssl-volume
           secret:
-            secretName: {{ template "trino.fullname" . }}-security-key
-            items:
-              - key: keystore.jks
-                path: keystore.jks
-              - key: truststore.jks
-                path: truststore.jks
+            secretName: trino-security-key
+           #  items:
+             #  - key: keystore.jks
+             #    path: keystore.jks
+             #  - key: truststore.jks
+             #    path: truststore.jks
         - name: schemas-volume
           configMap:
             name: {{ template "trino.fullname" . }}-schemas-volume-coordinator
@@ -147,7 +147,7 @@ spec:
           volumeMounts:
             - mountPath: {{ .Values.server.config.path }}
               name: config-volume
-            - mountPath: {{ .Values.server.config.path }}security/
+            - mountPath: /etc/trino/security/
               name: ssl-volume
             {{- if or .Values.catalogs .Values.additionalCatalogs }}
             - mountPath: {{ .Values.server.config.path }}/catalog

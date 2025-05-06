@@ -65,8 +65,8 @@ spec:
             name: {{ template "trino.catalog" . }}
         {{- end }}
         - name: ssl-volume
-          configMap:
-            name: {{ template "trino.fullname" . }}-security-key
+          secret:
+            secretName: trino-security-key
         - name: schemas-volume
           configMap:
             name: {{ template "trino.fullname" . }}-schemas-volume-worker
@@ -137,7 +137,7 @@ spec:
           volumeMounts:
             - mountPath: {{ .Values.server.config.path }}
               name: config-volume
-            - mountPath: {{ .Values.server.config.path }}security/
+            - mountPath: /etc/trino/security/
               name: ssl-volume
             {{- if or .Values.catalogs .Values.additionalCatalogs }}
             - mountPath: {{ .Values.server.config.path }}/catalog

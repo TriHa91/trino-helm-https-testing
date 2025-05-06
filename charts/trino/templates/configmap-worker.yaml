@@ -69,7 +69,15 @@ data:
     password-authenticator.config-files={{ .Values.server.config.path }}password-authenticator.properties
     http-server.https.enabled=true
     http-server.https.port={{ .Values.server.config.https.port }}
-    http-server.https.keystore.path={{ .Values.server.config.path }}security/private_key.pem
+    # http-server.https.keystore.path={{ .Values.server.config.path }}security/private_key.pem
+    http-server.https.keystore.path={{ .Values.server.config.https.keystore.path }}security/keystore.jks
+    http-server.https.keystore.key=hanhattri
+    http-server.https.truststore.path={{ .Values.server.config.https.keystore.path }}security/truststore.jks
+    http-server.https.truststore.key=hanhattri
+    internal-communication.https.truststore.path={{ .Values.server.config.https.keystore.path }}security/truststore.jks
+    internal-communication.https.truststore.key=hanhattri
+    internal-communication.https.keystore.path={{ .Values.server.config.https.keystore.path }}security/keystore.jks
+    internal-communication.https.keystore.key=hanhattri
     internal-communication.shared-secret=ABCXYZ123
     internal-communication.https.required=true
     # {{- range $configValue := .Values.additionalConfigProperties }}
