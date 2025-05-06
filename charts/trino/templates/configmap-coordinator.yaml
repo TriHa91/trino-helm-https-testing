@@ -60,7 +60,8 @@ data:
     # {{- if .Values.coordinator.config.memory.heapHeadroomPerNode }}
     # memory.heap-headroom-per-node={{ .Values.coordinator.config.memory.heapHeadroomPerNode }}
     # {{- end }}
-    discovery.uri=https://{{ template "trino.coordinator" . }}:{{ .Values.server.config.https.port }}
+    # discovery.uri=https://{{ template "trino.coordinator" . }}:{{ .Values.server.config.https.port }}
+    discovery.uri=http://localhost:{{ .Values.service.port }}
     # {{- if .Values.server.config.authenticationType }}
     http-server.process-forwarded=true
     http-server.authentication.type={{ .Values.server.config.authenticationType }}
@@ -201,19 +202,4 @@ data:
   {{- range $key, $val := .Values.kafka.tableDescriptions }}
   {{ $key }}: {{ $val | quote }}
   {{- end }}
-
----
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: {{ template "trino.fullname" . }}-security-key
-  namespace: {{ .Release.Namespace }}
-  labels:
-    {{- include "trino.labels" . | nindent 4 }}
-    app.kubernetes.io/component: coordinator
-data:
-  keystore.jks: |
-    {{ .Files.Get "/trino-config/keystore.jks" }}
-  truststore.jks: |
-    {{ .Files.Get "/trino-config/truststore.jks" }}
   
