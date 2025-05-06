@@ -62,7 +62,8 @@ data:
     # {{- if .Values.worker.config.memory.heapHeadroomPerNode }}
     # memory.heap-headroom-per-node={{ .Values.worker.config.memory.heapHeadroomPerNode }}
     # {{- end }}
-    discovery.uri=https://{{ template "trino.coordinator" . }}:{{ .Values.service.nodePort }}
+    # discovery.uri=https://{{ template "trino.coordinator" . }}:{{ .Values.service.nodePort }}
+    discovery.uri=http://localhost:{{ .Values.service.port }}
     http-server.process-forwarded=true
     http-server.authentication.type={{ .Values.server.config.authenticationType }}
     password-authenticator.config-files={{ .Values.server.config.path }}password-authenticator.properties
@@ -123,18 +124,6 @@ data:
   {{ $fileName }}: |
     {{- tpl $fileContent $ | nindent 4 }}
 {{- end }}
----
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: {{ template "trino.fullname" . }}-security-key
-  namespace: {{ .Release.Namespace }}
-  labels:
-    {{- include "trino.labels" . | nindent 4 }}
-    app.kubernetes.io/component: worker
-data:
-  private_key.pem: |
-    {{ .Files.Get "path/to/private_key.pem" }}
 ---
 apiVersion: v1
 kind: ConfigMap
