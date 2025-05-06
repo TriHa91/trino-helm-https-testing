@@ -12,12 +12,12 @@ metadata:
 spec:
   type: {{ .Values.service.type }}
   ports:
-    - port: {{ .Values.server.config.https.port }}
-      targetPort: {{ .Values.server.config.https.port }}
+    - port: 8443
+      targetPort: 8443
       protocol: TCP
       name: https
       {{- if .Values.service.nodePort }}
-      nodePort: {{ .Values.service.nodePort }}
+      nodePort: 30443
       {{- end }}
     {{- if $coordinatorJmx.exporter.enabled }}
     - port: {{ $coordinatorJmx.exporter.port }}
