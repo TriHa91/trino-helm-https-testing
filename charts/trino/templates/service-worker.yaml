@@ -10,7 +10,7 @@ metadata:
   annotations:
     {{- toYaml .Values.service.annotations | nindent 4 }}
 spec:
-  clusterIP: None
+  clusterIP: ""
   ports:
     - port: 8443
       targetPort: 8443

@@ -62,14 +62,13 @@ data:
     # {{- if .Values.worker.config.memory.heapHeadroomPerNode }}
     # memory.heap-headroom-per-node={{ .Values.worker.config.memory.heapHeadroomPerNode }}
     # {{- end }}
-    # discovery.uri=https://{{ template "trino.coordinator" . }}:{{ .Values.service.nodePort }}
-    discovery.uri=http://localhost:{{ .Values.service.port }}
+    discovery.uri=https://trino-coordinator:8443
+    # discovery.uri=http://{{ template "trino.fullname" . }}:{{ .Values.service.port }}
     http-server.process-forwarded=true
     http-server.authentication.type={{ .Values.server.config.authenticationType }}
     password-authenticator.config-files={{ .Values.server.config.path }}password-authenticator.properties
     http-server.https.enabled=true
     http-server.https.port={{ .Values.server.config.https.port }}
-    # http-server.https.keystore.path={{ .Values.server.config.path }}security/private_key.pem
     http-server.https.keystore.path={{ .Values.server.config.https.keystore.path }}security/keystore.jks
     http-server.https.keystore.key=hanhattri
     http-server.https.truststore.path={{ .Values.server.config.https.keystore.path }}security/truststore.jks
