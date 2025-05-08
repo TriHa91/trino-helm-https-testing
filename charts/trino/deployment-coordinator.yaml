@@ -1,6 +1,6 @@
 {{- $coordinatorJmx := merge .Values.jmx.coordinator (omit .Values.jmx "coordinator" "worker") -}}
 apiVersion: apps/v1
-kind: StatefulSet  # Thay đổi từ Deployment sang StatefulSet
+kind: Deployment
 metadata:
   name: {{ template "trino.coordinator" . }}
   namespace: {{ .Release.Namespace }}
@@ -14,15 +14,10 @@ metadata:
   annotations:
     {{- toYaml .Values.coordinator.deployment.annotations | nindent 4 }}
 spec:
-  serviceName: {{ template "trino.coordinator" . }}  # Thêm serviceName - bắt buộc cho StatefulSet
-  replicas: {{ .Values.coordinator.replicas | default 1 }}  # Xác định số lượng replicas
-  podManagementPolicy: Parallel  # Tùy chọn: thêm podManagementPolicy (Parallel hoặc OrderedReady)
-  updateStrategy:  # Thay đổi strategy sang updateStrategy
-    type: RollingUpdate
-    rollingUpdate:
-      {{- if .Values.coordinator.updateStrategy }}
-      {{- toYaml .Values.coordinator.updateStrategy | nindent 6 }}
-      {{- end }}
+  progressDeadlineSeconds: {{ .Values.coordinator.deployment.progressDeadlineSeconds }}
+  revisionHistoryLimit: {{ .Values.coordinator.deployment.revisionHistoryLimit }}
+  strategy:
+    {{- toYaml .Values.coordinator.deployment.strategy | nindent 4 }}
   selector:
     matchLabels:
       {{- include "trino.selectorLabels" . | nindent 6 }}
@@ -68,6 +63,11 @@ spec:
         - name: ssl-volume
           secret:
             secretName: trino-security-key
+           #  items:
+             #  - key: keystore.jks
+             #    path: keystore.jks
+             #  - key: truststore.jks
+             #    path: truststore.jks
         - name: schemas-volume
           configMap:
             name: {{ template "trino.fullname" . }}-schemas-volume-coordinator
@@ -277,12 +277,3 @@ spec:
       tolerations:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-  # Thêm volumeClaimTemplates nếu cần PersistentVolume
-  # volumeClaimTemplates:
-  # - metadata:
-  #     name: data
-  #   spec:
-  #     accessModes: [ "ReadWriteOnce" ]
-  #     resources:
-  #       requests:
-  #         storage: 1Gi
